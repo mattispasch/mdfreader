@@ -428,8 +428,21 @@ class CommentBlock(MDFBlock):
 
     def __init__(self, fid=None, pointer=None, MDType=None):
         self.namespace = '{http://www.asam.net/mdf/v4}'
-        if fid is not None:
-            self.read(fid, pointer, MDType)
+        self.fid = fid
+        self.pointer = pointer
+        self.MDType = MDType
+        self.isInitialized = False
+
+    def __readData(self):
+        self.isInitialized = True
+        if self.fid is not None:
+            self.read(self.fid, self.pointer, self.MDType)
+
+    def __getitem__(self, key):
+        if not self.isInitialized:
+            self.__readData()
+        # call super-class method
+        return dict.__getitem__(self, key)
 
     def read(self, fid, pointer, MDType=None):
         """ reads Comment block and saves in class dict
